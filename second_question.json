@@ -1,0 +1,50 @@
+{
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "あらら、何か理由があるの？",
+        "weight": "bold",
+        "size": "md"
+      }
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "忘れていた・・・",
+          "text": "忘れていた・・・"
+        }
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "時間がなかった・・・",
+          "text": "時間がなかった・・・"
+        }
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "今回は大丈夫！",
+          "text": "今回は大丈夫！"
+        }
+      }
+    ]
+  },
+  "styles": {
+    "body": {
+      "backgroundColor": "#FDDDDE"
+    }
+  }
+}
