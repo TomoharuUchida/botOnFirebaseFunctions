@@ -8,10 +8,10 @@ admin.initializeApp();
 // const db = admin.firestore();
 
 // タイマーで実行されるプッシュメッセージの送信のfunction
-// scheduleの()内にcronコマンドで書いて、日時指定する。以下は毎週月曜13:30実行
+// scheduleの()内にcronコマンドで書いて、日時指定する。以下は毎週月曜14:00実行
 exports.scheduledFunc = functions
     .region("asia-northeast1")
-    .pubsub.schedule("30 13 * * 1")
+    .pubsub.schedule("every monday 14:00")
     .onRun(async (context) => {
       //         console.info("5分毎に実行！");
       //         return;
