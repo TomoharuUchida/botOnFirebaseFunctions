@@ -7,10 +7,11 @@ const line = require("@line/bot-sdk");
 admin.initializeApp();
 // const db = admin.firestore();
 
-// タイマーで実行されるプッシュメッセージの送信
+// タイマーで実行されるプッシュメッセージの送信のfunction
+// scheduleの()内にcronコマンドで書いて、日時指定する。以下は毎週月曜13:30実行
 exports.scheduledFunc = functions
     .region("asia-northeast1")
-    .pubsub.schedule("every 1 minutes")
+    .pubsub.schedule("30 13 * * 1")
     .onRun(async (context) => {
       //         console.info("5分毎に実行！");
       //         return;
@@ -136,7 +137,7 @@ exports.scheduledFunc = functions
     });
 
 
-// ユーザーから送られたメッセージに応答する
+// ユーザーから送られたメッセージに応答するfunction
 exports.lineBot = functions
     .region("asia-northeast1")
     .https.onRequest(async (request, response) => {
@@ -163,7 +164,7 @@ exports.lineBot = functions
         channelSecret: process.env.CHANNEL_SECRET,
       });
 
-      // 単純なテキストメッセージで応答（話題の提供）をする
+      // 単純なテキストメッセージで応答（話題の提供）をする。使用しない
       // 提案する話題
       /* const messageArray = [
         "健康面で気になることなど、体調について聞いてみましょう。",
@@ -180,6 +181,7 @@ exports.lineBot = functions
       // 返す話題を選ぶための乱数
       // const numberOfSelectedMsg =
       //   Math.floor(Math.random() * (messageArray.length + 1));
+
 
       // 返信用のメッセージ
       // 連絡取ってるか「はい」への応答
@@ -351,7 +353,7 @@ exports.lineBot = functions
       // 連絡取ってるか「時間がなかった・・・」への応答
       const replyCaseBusy = {
         "type": "text",
-        "text": "だいたいみんなそうよね $\nおいしかったご飯の写真とか送るだけでもいいと思うよ $",
+        "text": "だいたいみんなそうよね $\n最近うれしかったこととか、おいしかったご飯の写真とか送るだけでもいいと思うよ $",
         "emojis": [
           {
             "index": 12,
@@ -395,28 +397,29 @@ exports.lineBot = functions
       // 「体調のこと」への応答
       const replyAdviceHealth = {
         "type": "text",
-        "text": "「最近、腰の調子はどう？」みたいに、さりげなーく聞くのがポイント\n突然改まって聞くと逆に不安にさせるわよ",
+        "text":
+          "「最近、腰の調子はどう？」みたいに、さりげなーく聞くのがポイント\n突然改まって聞くと逆に不安にさせるわよ\nさぁ連絡！連絡ゥ！",
       };
       // 「食事のこと」への応答
       const replyAdviceMeal = {
         "type": "text",
-        "text": "食べる時間が不規則だったり、食べなかったりしてるかも\n気にしてみてね",
+        "text": "食べる時間が不規則だったり、食べなかったりしてるかも\n気にしてみてね\nさぁ連絡！連絡ゥ！",
       };
       // 「運動のこと」への応答
       const replyAdviceExercise = {
         "type": "text",
-        "text": "理想は「30分以上の運動を週2日以上」らしいわよ\n軽い散歩でいいからやってほしい",
+        "text": "理想は「30分以上の運動を週2日以上」らしいわよ\n軽い散歩からススメてみよう\nさぁ連絡！連絡ゥ！",
       };
       // 「困りごと」への応答
       const replyAdviceProblems = {
         "type": "text",
         "text":
-           "重い物を運ぶとか、買い物とか、ちょっとしたことが難しくなるのよね\n帰省した時に手伝ったり、通販で買って贈ってあげるとかもいいかも",
+           "重い物を運ぶとか、ちょっとしたことが難しくなるのよね\n帰省した時に手伝うとか、通販で贈るとかいいかも\nさぁ連絡！連絡ゥ！",
       };
       // 「心配事」への応答
       const replyAdviceWorry = {
         "type": "text",
-        "text": "詐欺とか事故多いわよね\nニュースを見た時とかに連絡をとると、ご家族もきっと安心するわよ",
+        "text": "詐欺とか事故多いわよね\nニュースを見た時とかに連絡をとると、ご家族もきっと安心するわよ\nさぁ連絡！連絡ゥ！",
       };
       // 想定外への応答
       const replyUnexpected = {
