@@ -4,14 +4,41 @@ require("dotenv").config();
 const line = require("@line/bot-sdk");
 // import * as crypto from "crypto";
 
+require("firebase-functions/lib/logger/compat");
+// const cors = require("cors")({origin: true});
+// const {default: axios} = require("axios");
+// const NewsAPI = require("newsapi");
+// const newsapi = new NewsAPI(process.env.CHANNEL_SECRET_NEWSAPI);
+
 admin.initializeApp();
 // const db = admin.firestore();
+/*
+const sendHealthNews = functions.https.onRequest((request, response) => {
+  const urls = [];
+  cors(request, response, () => {
+    newsapi.v2.everything({
+      q: "senior health",
+      language: "en",
+      sortBy: "popularity",
+      page: 2,
+    }).then((response) => {
+      console.log(response);
+      const responseTexts = response["articles"];
+      responseTexts.forEach(function(item) {
+        urls.push(item.url);
+      });
+      console.log(urls);
+    });
+  });
+  console.log("I am a log entry!");
+  return urls;
+});*/
 
 // タイマーで実行されるプッシュメッセージの送信のfunction
 // scheduleの()内にcronコマンドで書いて、日時指定する。以下は毎週月曜14:00実行
 exports.scheduledFunc = functions
     .region("asia-northeast1")
-    .pubsub.schedule("every monday 14:00")
+    .pubsub.schedule("30 11 * * 3")
     .onRun(async (context) => {
       //         console.info("5分毎に実行！");
       //         return;
@@ -361,7 +388,7 @@ exports.lineBot = functions
             "emojiId": "053",
           },
           {
-            "index": 40,
+            "index": 53,
             "productId": "5ac1bfd5040ab15980c9b435",
             "emojiId": "074",
           },
@@ -398,28 +425,54 @@ exports.lineBot = functions
       const replyAdviceHealth = {
         "type": "text",
         "text":
-          "「最近、腰の調子はどう？」みたいに、さりげなーく聞くのがポイント\n突然改まって聞くと逆に不安にさせるわよ\nさぁ連絡！連絡ゥ！",
+          "「最近、腰の調子はどう？」みたいに、さりげなーく聞くのがポイント\n突然改まって聞くと逆に不安にさせるの\n話題を送るから連絡するのよ",
+      };
+      // 高齢者 体調 ニュース
+      const textMessageHealthUrl = {
+        "type": "text",
+        "text": "https://www3.nhk.or.jp/news/html/20220506/k10013613511000.html",
       };
       // 「食事のこと」への応答
       const replyAdviceMeal = {
         "type": "text",
-        "text": "食べる時間が不規則だったり、食べなかったりしてるかも\n気にしてみてね\nさぁ連絡！連絡ゥ！",
+        "text": "食べる時間が不規則だったり、偏ったりしてるかも\n気にしてみてね\n話題を送るから連絡するのよ",
+      };
+      // 高齢者 食事 ニュース
+      const textMessageMealUrl = {
+        "type": "text",
+        "text": "https://hicbc.com/tv/genki/archive/220508/",
       };
       // 「運動のこと」への応答
       const replyAdviceExercise = {
         "type": "text",
-        "text": "理想は「30分以上の運動を週2日以上」らしいわよ\n軽い散歩からススメてみよう\nさぁ連絡！連絡ゥ！",
+        "text": "理想は「30分以上の運動を週2日以上」なの\n軽い散歩からススメてみて\n話題を送るから連絡するのよ",
+      };
+
+      // 高齢者 運動 ニュース
+      const textMessageExerciseUrl = {
+        "type": "text",
+        "text": "https://news.yahoo.co.jp/articles/a207630930a3801e091f9f251300dabd14649934",
       };
       // 「困りごと」への応答
       const replyAdviceProblems = {
         "type": "text",
         "text":
-           "重い物を運ぶとか、ちょっとしたことが難しくなるのよね\n帰省した時に手伝うとか、通販で贈るとかいいかも\nさぁ連絡！連絡ゥ！",
+           "重い物を運ぶとか、ちょっとしたことが難しくなるのよね\n帰省した時に手伝うとか、通販で贈るとかいいかも\n話題を送るから連絡するのよ",
+      };
+      // 高齢者 困りごと ニュース
+      const textMessageProblemsUrl = {
+        "type": "text",
+        "text": "https://prtimes.jp/main/html/rd/p/000000007.000081613.html",
       };
       // 「心配事」への応答
       const replyAdviceWorry = {
         "type": "text",
-        "text": "詐欺とか事故多いわよね\nニュースを見た時とかに連絡をとると、ご家族もきっと安心するわよ\nさぁ連絡！連絡ゥ！",
+        "text": "詐欺とか事故多いわよね\nニュースを見た時とかに連絡をとると、ご家族もきっと安心するわよ\n話題を送るから連絡するのよ",
+      };
+      // 高齢者 心配事 ニュース
+      const textMessageWorryUrl = {
+        "type": "text",
+        "text": "https://yomidr.yomiuri.co.jp/article/20220222-OYTET50032/",
       };
       // 想定外への応答
       const replyUnexpected = {
@@ -438,7 +491,7 @@ exports.lineBot = functions
       // 送信メッセージを入れる空の配列
       const textMessage = [];
 
-      const replyMessage = (messageFromUser) => {
+      const replyMessage = async (messageFromUser) => {
         switch (messageFromUser) {
           case "はい":
             return textMessage.push(replyCaseYesStamp, replyCaseYes);
@@ -455,15 +508,21 @@ exports.lineBot = functions
           case "今回は大丈夫！":
             return textMessage.push(replyCaseSkipStamp, replyCaseSkip);
           case "体調のこと":
-            return textMessage.push(replyAdviceHealth);
+            return textMessage.push(replyAdviceHealth, textMessageHealthUrl);
           case "食事のこと":
-            return textMessage.push(replyAdviceMeal);
+            return textMessage.push(replyAdviceMeal, textMessageMealUrl );
           case "運動のこと":
-            return textMessage.push(replyAdviceExercise);
+            return textMessage.push(
+                replyAdviceExercise,
+                textMessageExerciseUrl);
           case "困りごと":
-            return textMessage.push(replyAdviceProblems);
+            return textMessage.push(
+                replyAdviceProblems,
+                textMessageProblemsUrl);
           case "心配事":
-            return textMessage.push(replyAdviceWorry);
+            return textMessage.push(
+                replyAdviceWorry,
+                textMessageWorryUrl);
           default:
             return textMessage.push(replyUnexpected);
         }
